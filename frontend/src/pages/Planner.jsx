@@ -9,7 +9,15 @@ import {
   StepTitle,
   Stepper,
   useSteps,
-  Box
+  Box,
+  SimpleGrid,
+  Card,
+  CardBody,
+  CardHeader,
+  CardFooter,
+  Heading,
+  Button,
+  Text
 } from '@chakra-ui/react'
 
 const steps = [
@@ -36,18 +44,43 @@ function Planner() {
               incomplete={<StepNumber />}
               active={<StepNumber />}
             />
-
           </StepIndicator>
 
           <Box flexShrink='0' colorScheme='red'>
             <StepTitle color='#F5F9E9'>{step.title}</StepTitle>
-            <StepDescription color='#C2C1A5'>{step.description}</StepDescription>
+            <StepDescription fontWeight="bold" color='#C2C1A5'>{step.description}</StepDescription>
           </Box>
 
           <StepSeparator />
         </Step>
         ))}
       </Stepper>
+      
+
+      <SimpleGrid spacing={4} margin={5} templateColumns='repeat(auto-fill, minmax(500px, 1fr))'>
+        <Card boxShadow='lg'>
+          <CardHeader>
+            <Heading size='md'> Customer dashboard</Heading>
+          </CardHeader>
+          <CardBody>
+            <Text>View a summary of all your customers over the last month.</Text>
+          </CardBody>
+          <CardFooter>
+            <Button>View here</Button>
+          </CardFooter>
+        </Card>
+        <Card boxShadow='lg'>
+          <CardHeader>
+            <Heading size='md'> Customer dashboard</Heading>
+          </CardHeader>
+          <CardBody>
+            <Text>View a summary of all your customers over the last month.</Text>
+          </CardBody>
+          <CardFooter>
+            <Button>View here</Button>
+          </CardFooter>
+        </Card>
+      </SimpleGrid>
     </Box>
   )
 }
