@@ -1,0 +1,204 @@
+Index: src/main/model/Dealership.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\n\nimport org.json.JSONArray;\nimport org.json.JSONObject;\n\nimport java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.List;\n\n// Represents a dealership with a brand name consisting of cars that are either sold or not\npublic class Dealership {\n    private ArrayList<Car> cars;\n    private String brand;\n\n    // EFFECTS: constructs a dealership with given name and an empty list of cars\n    public Dealership(String name) {\n        brand = name;\n        cars = new ArrayList<>();\n    }\n\n    // MODIFIES: this\n    // EFFECTS: adds a car to the dealership and sets its id number\n    public void addCar(Car car) {\n        cars.add(car);\n        String model = car.getModel().substring(0, 1).toUpperCase() + car.getModel().substring(1);\n        String fuel = car.getFuelType().substring(0, 1).toUpperCase() + car.getFuelType().substring(1);\n        EventLog.getInstance().logEvent(new Event(\"Added \" + model + \"(\" + car.getYear() + \"), \" + fuel));\n    }\n\n    // MODIFIES: this\n    // EFFECTS: removes a car from the dealership\n    public void removeCar(Car car) {\n        cars.remove(car);\n        String model = car.getModel().substring(0, 1).toUpperCase() + car.getModel().substring(1);\n        String fuel = car.getFuelType().substring(0, 1).toUpperCase() + car.getFuelType().substring(1);\n        EventLog.getInstance().logEvent(new Event(\"Removed \" + model + \"(\" + car.getYear() + \"), \" + fuel));\n    }\n\n    // EFFECTS: returns the total number of cars in the dealership\n    public int numCars() {\n        return cars.size();\n    }\n\n    // EFFECTS: returns a list of all the sold cars\n    public List<Car> soldCars() {\n        List<Car> soldCars = new ArrayList<>();\n        for (Car car : cars) {\n            if (car.isSold()) {\n                soldCars.add(car);\n            }\n        }\n        return soldCars;\n    }\n\n    // EFFECTS: returns a list of all the unsold cars\n    public List<Car> unsoldCars() {\n        List<Car> unsoldCars = new ArrayList<>();\n        for (Car car : cars) {\n            if (!car.isSold()) {\n                unsoldCars.add(car);\n            }\n        }\n        return unsoldCars;\n    }\n\n    // EFFECTS: returns the total number of sold cars in the dealership\n    public int numSoldCars() {\n        return soldCars().size();\n    }\n\n    // EFFECTS: returns the name of dealership\n    public String getBrand() {\n        return brand;\n    }\n\n    // EFFECTS: returns a list of all the cars\n    public List<Car> allCars() {\n        return cars;\n    }\n\n\n    // EFFECTS: returns an unmodifiable list of thingies in this workroom\n    public List<Car> getAllCars() {\n        return Collections.unmodifiableList(cars);\n    }\n\n    // EFFECTS: returns this as a jason object\n    public JSONObject toJson() {\n        JSONObject json = new JSONObject();\n        json.put(\"brand\", brand);\n        json.put(\"cars\", carsToJason());\n        return json;\n    }\n\n    // EFFECTS: returns cars in this dealership as a JSON array\n    private JSONArray carsToJason() {\n        JSONArray jsonArray = new JSONArray();\n\n        for (Car c : cars) {\n            jsonArray.put(c.toJson());\n        }\n\n        return jsonArray;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/model/Dealership.java b/src/main/model/Dealership.java
+--- a/src/main/model/Dealership.java	
++++ b/src/main/model/Dealership.java	
+@@ -16,6 +16,7 @@
+     public Dealership(String name) {
+         brand = name;
+         cars = new ArrayList<>();
++        EventLog.getInstance().logEvent(new Event("Created a new " + brand.toUpperCase() + " dealership"));
+     }
+ 
+     // MODIFIES: this
+@@ -24,7 +25,8 @@
+         cars.add(car);
+         String model = car.getModel().substring(0, 1).toUpperCase() + car.getModel().substring(1);
+         String fuel = car.getFuelType().substring(0, 1).toUpperCase() + car.getFuelType().substring(1);
+-        EventLog.getInstance().logEvent(new Event("Added " + model + "(" + car.getYear() + "), " + fuel));
++        EventLog.getInstance().logEvent(new Event("Added car " + model + " ("
++                + car.getYear() + "), " + fuel));
+     }
+ 
+     // MODIFIES: this
+@@ -33,7 +35,8 @@
+         cars.remove(car);
+         String model = car.getModel().substring(0, 1).toUpperCase() + car.getModel().substring(1);
+         String fuel = car.getFuelType().substring(0, 1).toUpperCase() + car.getFuelType().substring(1);
+-        EventLog.getInstance().logEvent(new Event("Removed " + model + "(" + car.getYear() + "), " + fuel));
++        EventLog.getInstance().logEvent(new Event("Removed car " + model
++                + " (" + car.getYear() + "), " + fuel));
+     }
+ 
+     // EFFECTS: returns the total number of cars in the dealership
+Index: src/main/model/Car.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\n\nimport org.json.JSONObject;\n\n// Represents a car with given features and sale status\npublic class Car {\n    private String model;\n    private int year;\n    private String fuelType;\n    private double mpg;\n    private boolean sold;\n\n    // REQUIRES: fuelTYpe == \"petrol\" | \"diesel\" | \"electric\", model.length >= 0,\n    //           2000 <= year <= 2022 and 10.0 <= mpg <= 50.0\n    // EFFECTS: constructs a car with given model, year, fuelType, mpg\n    // which has not been sold yet and id = 0\n    public Car(String model, int year, String fuelType, double mpg) {\n        this.model = model;\n        this.year = year;\n        this.fuelType = fuelType;\n        this.mpg = mpg;\n        sold = false;\n    }\n\n    public String getModel() {\n        return model;\n    }\n\n    public int getYear() {\n        return year;\n    }\n\n    public String getFuelType() {\n        return fuelType;\n    }\n\n    public double getMpg() {\n        return mpg;\n    }\n\n    // EFFECTS: returns true if the car has been sold\n    public boolean isSold() {\n        return sold;\n    }\n\n    // MODIFIES: this\n    // EFFECTS: marks the car as sold\n    public void sellCar() {\n        sold = true;\n        model = model.substring(0, 1).toUpperCase() + model.substring(1);\n        String fuel = fuelType.substring(0, 1).toUpperCase() + fuelType.substring(1);\n        EventLog.getInstance().logEvent(new Event(\"Sold \" + model + \"(\" + year + \"), \" + fuel));\n    }\n\n    // MODIFIES: this\n    // EFFECTS: sets sold to status\n    public void setSaleStatus(boolean status) {\n        sold = status;\n    }\n\n\n    // EFFECTS: returns this as a jason object\n    public JSONObject toJson() {\n        JSONObject json = new JSONObject();\n        json.put(\"model\", model);\n        json.put(\"year\", year);\n        json.put(\"fuelType\", fuelType);\n        json.put(\"mpg\", mpg);\n        json.put(\"sold\", sold);\n        return json;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/model/Car.java b/src/main/model/Car.java
+--- a/src/main/model/Car.java	
++++ b/src/main/model/Car.java	
+@@ -10,7 +10,7 @@
+     private double mpg;
+     private boolean sold;
+ 
+-    // REQUIRES: fuelTYpe == "petrol" | "diesel" | "electric", model.length >= 0,
++    // REQUIRES: fuelTYpe == "petrol" || "diesel" || "electric", model.length >= 0,
+     //           2000 <= year <= 2022 and 10.0 <= mpg <= 50.0
+     // EFFECTS: constructs a car with given model, year, fuelType, mpg
+     // which has not been sold yet and id = 0
+@@ -49,7 +49,7 @@
+         sold = true;
+         model = model.substring(0, 1).toUpperCase() + model.substring(1);
+         String fuel = fuelType.substring(0, 1).toUpperCase() + fuelType.substring(1);
+-        EventLog.getInstance().logEvent(new Event("Sold " + model + "(" + year + "), " + fuel));
++        EventLog.getInstance().logEvent(new Event("Sold car " + model + " (" + year + "), " + fuel));
+     }
+ 
+     // MODIFIES: this
+Index: src/main/ui/panels/HomeTab.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.panels;\n\nimport model.Car;\nimport model.Dealership;\nimport persistence.JsonWriter;\nimport ui.DealershipGraphicalUI;\nimport javax.swing.*;\nimport java.awt.*;\nimport java.awt.event.ActionEvent;\nimport java.awt.event.ActionListener;\nimport java.io.IOException;\n\n// Represents a panel which acts as the home page and holds the main menu\npublic class HomeTab extends JPanel implements ActionListener {\n    private JLabel greeting;\n    private Dealership dealership;\n    private JButton addButton;\n    private JButton quitButton;\n    private JButton saveButton;\n    private JPanel labelAndText;\n    private JTextField model;\n    private JTextField year;\n    private JTextField fuel;\n    private JTextField mpg;\n    private DealershipGraphicalUI gui;\n    private DirectoryTab directory;\n    private WarehouseTab warehouse;\n    private final JsonWriter writer;\n    private static final String JSON_STORE = \"./data/dealership.json\";\n\n    // EFFECTS: constructs a panel with a greeting and buttons for the main menu\n    public HomeTab(Dealership dealership, DealershipGraphicalUI ui, DirectoryTab directory, WarehouseTab warehouse) {\n        gui = ui;\n        writer = new JsonWriter(JSON_STORE);\n        this.dealership = dealership;\n        this.warehouse = warehouse;\n        this.directory = directory;\n        setLayout(new GridLayout(2,1));\n        setUpHomePanel();\n    }\n\n    // EFFECTS: sets up the home page\n    public void setUpHomePanel() {\n        addGreeting();\n        addHomeButtons();\n    }\n\n    // MODIFIES: this\n    // EFFECTS: creates greeting label at the top of this panel\n    public void addGreeting() {\n        greeting = new JLabel(dealership.getBrand() + \" Vancouver\", JLabel.CENTER);\n        greeting.setSize(WIDTH, HEIGHT / 2);\n        greeting.setFont(new Font(\"Lucida Grande\", Font.PLAIN, 16));\n        this.add(greeting);\n    }\n\n    // MODIFIES: this\n    // EFFECTS: adds buttons to add car, save file and quit application to this panel\n    public void addHomeButtons() {\n        JPanel buttonPanel = new JPanel();\n        addButton = new JButton(\"Add new car\");\n        quitButton = new JButton(\"Quit\");\n        saveButton = new JButton(\"Save \");\n\n        buttonPanel.add(addButton);\n        addButton.addActionListener(this);\n        buttonPanel.add(saveButton);\n        saveButton.addActionListener(this);\n        buttonPanel.add(quitButton);\n        quitButton.addActionListener(this);\n\n        buttonPanel.setSize(WIDTH, HEIGHT / 2);\n        this.add(buttonPanel);\n    }\n\n    @Override\n    // MODIFIES: directory, warehouse\n    // EFFECTS: on clicking the respective buttons,\n    //             adds a new car to the dealership,\n    //             saves current application state, or\n    //             quits the application\n    //          updates all the other panels at the end\n    public void actionPerformed(ActionEvent e) {\n        if (e.getSource() == addButton) {\n            addCarDialog();\n        } else if (e.getSource() == saveButton) {\n            saveData();\n        } else if (e.getSource() == quitButton) {\n            quitOptionsDialog();\n        }\n        directory.update();\n        warehouse.update();\n    }\n\n    // Based on saveWorkRoom method in the WorkRoomApp class:\n    // https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\n    // EFFECTS: saves the existing state of the dealership to file\n    public void saveData() {\n        try {\n            writer.openWriter();\n            writer.writeFile(dealership);\n            writer.closeWriter();\n            JOptionPane.showMessageDialog(this,\n                    \"All changes have been saved\",\n                    \"Data saved\", JOptionPane.PLAIN_MESSAGE);\n        } catch (IOException i) {\n            JOptionPane.showMessageDialog(this,\n                    \"Could not save file\",\n                    \"Error\",\n                    JOptionPane.ERROR_MESSAGE);\n        }\n    }\n\n    // EFFECTS: prompts user with a dialog box to enter information about new car to add\n    public void addCarDialog() {\n        model = new JTextField();\n        year = new JTextField();\n        fuel = new JTextField();\n        mpg = new JTextField();\n\n        labelAndText = new JPanel();\n        labelAndText.setLayout(new GridLayout(0, 2));\n        labelAndText.add(new JLabel(\"Model (alphanumeric characters only): \"));\n        labelAndText.add(model);\n        labelAndText.add(new JLabel(\"Year (2000 to 2022): \"));\n        labelAndText.add(year);\n        labelAndText.add(new JLabel(\"Fuel (Petrol, Diesel or Electric): \"));\n        labelAndText.add(fuel);\n        labelAndText.add(new JLabel(\"Miles Per Gallon (10.0 mpg to 50.0 mpg): \"));\n        labelAndText.add(mpg);\n\n        int i = JOptionPane.showConfirmDialog(this, labelAndText,\n                \"Add Car\", JOptionPane.OK_CANCEL_OPTION);\n\n        processOption(i);\n    }\n\n    // MODIFIES: dealership\n    // EFFECTS: processes the information entered by the user in the text fields,\n    //              if input is valid, then adds car with entered information, follows by a confirmation dialog\n    //              else error dialog appears and user is asked to try again\n    public void processOption(int i) {\n        if (i == 0) {\n            while (!validInput()) {\n                JOptionPane.showMessageDialog(this,\n                        \"Invalid values entered. Please try again...\",\n                        \"Error\", JOptionPane.ERROR_MESSAGE);\n                int n = JOptionPane.showConfirmDialog(this, labelAndText,\n                        \"Add Car\", JOptionPane.OK_CANCEL_OPTION);\n                if (n == JOptionPane.CANCEL_OPTION) {\n                    break;\n                }\n            }\n            int carYear = Integer.parseInt(year.getText());\n            double carMpg = Double.parseDouble(mpg.getText());\n            String carModel = model.getText();\n            String carFuel = fuel.getText();\n\n            carModel = carModel.substring(0, 1).toUpperCase() + carModel.substring(1);\n            carFuel = carFuel.substring(0, 1).toUpperCase() + carFuel.substring(1);\n\n            Car newCar = new Car(carModel, carYear, carFuel, carMpg);\n            dealership.addCar(newCar);\n\n            addConfirmed(newCar);\n        }\n    }\n\n    // EFFECTS: displays a dialog box that confirms car has been added and displays an image corresponding to\n    //          the fuel type of the car\n    public void addConfirmed(Car car) {\n        ImageIcon petrol = new ImageIcon(\"./data/resized_petrol_car.png\");\n        ImageIcon diesel = new ImageIcon(\"./data/resized_diesel_car.png\");\n        ImageIcon electric = new ImageIcon(\"./data/resized_electric_car.png\");\n        if (car.getFuelType().equals(\"Petrol\")) {\n            JOptionPane.showMessageDialog(this,\n                    \"Car has been added\",\n                    \"Car added\",\n                    JOptionPane.INFORMATION_MESSAGE, petrol);\n        } else if (car.getFuelType().equals(\"Diesel\")) {\n            JOptionPane.showMessageDialog(this,\n                    \"Car has been added\",\n                    \"Car added\",\n                    JOptionPane.INFORMATION_MESSAGE, diesel);\n        } else {\n            JOptionPane.showMessageDialog(this,\n                    \"Car has been added\",\n                    \"Car added\",\n                    JOptionPane.INFORMATION_MESSAGE, electric);\n        }\n    }\n\n    // EFFECTS: returns true if information entered about new car to add is valid, false otherwise\n    public boolean validInput() {\n        boolean valid;\n\n        if (!year.getText().matches(\"^\\\\d+$\") ||  !mpg.getText().matches(\"[0-9]{1,13}(\\\\.[0-9]*)?\")) {\n            return false;\n        } else {\n            int carYear = Integer.parseInt(year.getText());\n            double carMpg = Double.parseDouble(mpg.getText());\n            String carFuel = fuel.getText().toLowerCase();\n\n            boolean validModel = model.getText().matches(\"^[a-zA-Z0-9]+$\");\n            boolean validYear = carYear >= 2000 && carYear <= 2022;\n            boolean validMpg = carMpg >= 10.0 && carMpg <= 50.0;\n            boolean validFuel = carFuel.equals(\"petrol\") || carFuel.equals(\"diesel\") || carFuel.equals(\"electric\");\n\n            valid = validFuel && validModel && validMpg && validYear;\n            return valid;\n        }\n    }\n\n    // EFFECTS: prompts user with a dialog box that asks a last time to save the application state\n    public void quitOptionsDialog() {\n        int i = JOptionPane.showConfirmDialog(this,\n                \"Would you like to save your current file?\",\n                \"Save data\",\n                JOptionPane.YES_NO_OPTION);\n        if (i == 0) {\n            try {\n                writer.openWriter();\n                writer.writeFile(dealership);\n                writer.closeWriter();\n                JOptionPane.showMessageDialog(this,\n                        \"All changes have been saved. Thank you!\",\n                        \"Data saved\", JOptionPane.PLAIN_MESSAGE);\n            } catch (IOException e) {\n                JOptionPane.showMessageDialog(this,\n                        \"Could not save file\",\n                        \"Error\",\n                        JOptionPane.ERROR_MESSAGE);\n            }\n        }\n        gui.dispose();\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/panels/HomeTab.java b/src/main/ui/panels/HomeTab.java
+--- a/src/main/ui/panels/HomeTab.java	
++++ b/src/main/ui/panels/HomeTab.java	
+@@ -2,6 +2,8 @@
+ 
+ import model.Car;
+ import model.Dealership;
++import model.Event;
++import model.EventLog;
+ import persistence.JsonWriter;
+ import ui.DealershipGraphicalUI;
+ import javax.swing.*;
+@@ -233,5 +235,8 @@
+             }
+         }
+         gui.dispose();
++        for (Event event : EventLog.getInstance()) {
++            System.out.println(event.toString() + "\n\n");
++        }
+     }
+ }
+Index: src/test/model/TestForEventLog.java
+===================================================================
+diff --git a/src/test/model/TestForEventLog.java b/src/test/model/TestForEventLog.java
+new file mode 100644
+--- /dev/null	
++++ b/src/test/model/TestForEventLog.java	
+@@ -0,0 +1,77 @@
++package model;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import static org.junit.jupiter.api.Assertions.*;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class TestForEventLog {
++    private Dealership dealership;
++    private Car car1;
++    private Car car2;
++    private Car car3;
++    private Event event1;
++    private Event event2;
++    private Event event3;
++    private List<Event> events;
++
++    @BeforeEach
++    public void setUp() {
++        dealership = new Dealership("honda");
++        events = new ArrayList<>();
++        car1 = new Car("crv",2010,"diesel",12.8);
++        car2 = new Car("accord", 2018, "petrol", 18.4);
++        car3 = new Car("civic", 2021,"electric",25.6);
++        event1 = new Event("Created a new HONDA dealership");
++    }
++
++    @Test
++    public void testDealershipConstructorEvent() {
++        EventLog logs = EventLog.getInstance();
++        for (Event next : logs) {
++            events.add(next);
++        }
++        assertTrue(events.contains(event1));
++        logs.clear();
++    }
++
++    @Test
++    public void testAddCarEvent() {
++        dealership.addCar(car1);
++        EventLog logs = EventLog.getInstance();
++        for (Event next : logs) {
++            events.add(next);
++        }
++        event2 = new Event("Added car Crv (2010), Diesel");
++        assertTrue(events.contains(event2));
++        logs.clear();
++    }
++
++    @Test
++    public void testRemoveCarEvent() {
++        dealership.addCar(car1);
++        dealership.removeCar(car1);
++        EventLog logs = EventLog.getInstance();
++        for (Event next : logs) {
++            events.add(next);
++        }
++        event2 = new Event("Removed car Crv (2010), Diesel");
++        assertTrue(events.contains(event2));
++        logs.clear();
++    }
++
++    @Test
++    public void testSellCarEvent() {
++        dealership.addCar(car1);
++        car1.sellCar();
++        EventLog logs = EventLog.getInstance();
++        for (Event next : logs) {
++            events.add(next);
++        }
++        event3 = new Event("Sold car Crv (2010), Diesel");
++        assertTrue(events.contains(event3));
++        logs.clear();
++    }
++}
+Index: src/test/model/TestForEvent.java
+===================================================================
+diff --git a/src/test/model/TestForEvent.java b/src/test/model/TestForEvent.java
+new file mode 100644
+--- /dev/null	
++++ b/src/test/model/TestForEvent.java	
+@@ -0,0 +1,19 @@
++package model;
++
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import static org.junit.jupiter.api.Assertions.*;
++
++public class TestForEvent {
++    private Event event;
++
++    @BeforeEach
++    public void runBefore() {
++        event = new Event("Added a car to the dealership");
++    }
++
++    @Test
++    public void testEventConstructor() {
++        assertEquals("Added a car to the dealership", event.getDescription());
++    }
++}
