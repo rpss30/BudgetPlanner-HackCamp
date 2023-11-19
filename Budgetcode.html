@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background-color: #27213C; /* Dark Blue */
+      color: #fff;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+
+    .column {
+      width: 45%;
+      padding: 20px;
+      background-color: #27213C;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    #incomeItemsContainer, #expenseItemsContainer {
+      margin-top: 20px;
+    }
+
+    #totalIncomeExpenses {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Budget Planner</h1>
+
+  <div class="container">
+    <div class="column">
+      <h2>Income Sources</h2>
+      <label for="incomeName">Source:</label>
+      <input type="text" id="incomeName" placeholder="Enter income source">
+      <label for="incomeAmount">Amount:</label>
+      <input type="number" id="incomeAmount" placeholder="Enter income amount">
+      <button onclick="addIncome()">Add Income</button>
+    </div>
+
+    <div class="column">
+      <h2>Expenses</h2>
+      <label for="expenseType">Type:</label>
+      <select id="expenseType">
+        <option value="fixed">Fixed Expense</option>
+        <option value="variable">Variable Expense</option>
+      </select>
+      <label for="expenseName">Name:</label>
+      <input type="text" id="expenseName" placeholder="Enter expense name">
+      <label for="expenseAmount">Amount:</label>
+      <input type="number" id="expenseAmount" placeholder="Enter expense amount">
+      <label for="importance">Importance (1-10):</label>
+      <input type="number" id="importance" placeholder="Enter importance (1-10)" min="1" max="10">
+      <button onclick="addExpense()">Add Expense</button>
+    </div>
+  </div>
+
+  <!-- Separate containers for income and expense items -->
+  <div id="incomeItemsContainer" class="container"></div>
+  <div id="expenseItemsContainer" class="container"></div>
+
+  <!-- Paragraph for Total Income/Total Expenses -->
+  <p id="totalIncomeExpenses">Total Income: $0.00 | Total Expenses: $0.00</p>
+
+  <script>
+    function addIncome() {
+      const incomeName = document.getElementById('incomeName').value;
+      const incomeAmount = document.getElementById('incomeAmount').value;
+
+      if (incomeName && incomeAmount) {
+        const incomeItemsContainer = document.getElementById('incomeItemsContainer');
+        const incomeItem = document.createElement('div');
+        incomeItem.innerHTML = `<p>${incomeName} - $${incomeAmount}</p>`;
+        incomeItemsContainer.appendChild(incomeItem);
+
+        // Clear input fields
+        document.getElementById('incomeName').value = '';
+        document.getElementById('incomeAmount').value = '';
+
+        updateTotalIncomeExpenses();
+      }
+    }
+
+    function addExpense() {
+      const expenseType = document.getElementById('expenseType').value;
+      const expenseName = document.getElementById('expenseName').value;
+      const expenseAmount = document.getElementById('expenseAmount').value;
+      const importance = document.getElementById('importance').value;
+
+      if (expenseName && expenseAmount && importance) {
+        const expenseItemsContainer = document.getElementById('expenseItemsContainer');
+        const expenseItem = document.createElement('div');
+        expenseItem.innerHTML = `<p>${expenseType.toUpperCase()}: ${expenseName} - $${expenseAmount} (Importance: ${importance}/10)</p>`;
+        expenseItemsContainer.appendChild(expenseItem);
+
+        // Clear input fields
+        document.getElementById('expenseName').value = '';
+        document.getElementById('expenseAmount').value = '';
+        document.getElementById('importance').value = '';
+
+        updateTotalIncomeExpenses();
+      }
+    }
+
+    function updateTotalIncomeExpenses() {
+      const incomeItems = document.querySelectorAll('#incomeItemsContainer p');
+      const expenseItems = document.querySelectorAll('#expenseItemsContainer p');
+
+      let totalIncome = 0;
+      let totalExpenses = 0;
+
+      incomeItems.forEach(item => {
+        const amount = parseFloat(item.innerText.split(' - $')[1]);
+        totalIncome += amount;
+      });
+
+      expenseItems.forEach(item => {
+        const amount = parseFloat(item.innerText.split(' - $')[1].split(' ')[0]);
+        totalExpenses += amount;
+      });
+
+      const totalIncomeExpensesParagraph = document.getElementById('totalIncomeExpenses');
+      totalIncomeExpensesParagraph.innerText = `Total Income: $${totalIncome.toFixed(2)} | Total Expenses: $${totalExpenses.toFixed(2)}`;
+    }
+  </script>
+
+</body>
+</html>
