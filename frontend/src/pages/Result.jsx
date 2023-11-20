@@ -10,17 +10,14 @@ import {
   Stepper,
   useSteps,
   Box,
-  Center,
+  SimpleGrid,
   Card,
   CardBody,
   CardHeader,
   CardFooter,
   Heading,
   Button,
-  Text,
-  Input,
-  InputGroup,
-  InputLeftElement
+  Text
 } from '@chakra-ui/react'
 
 const steps = [
@@ -32,7 +29,7 @@ const steps = [
 
 function Goal() {
   const { activeStep } = useSteps({
-    index: 1,
+    index: 3,
     count: steps.length,
   })
 
@@ -49,7 +46,7 @@ function Goal() {
             />
           </StepIndicator>
 
-          <Box flexShrink='0'>
+          <Box flexShrink='0' colorScheme='red'>
             <StepTitle color='#F5F9E9'>{step.title}</StepTitle>
             <StepDescription color='#C2C1A5'>{step.description}</StepDescription>
           </Box>
@@ -58,39 +55,8 @@ function Goal() {
         </Step>
         ))}
       </Stepper>
-      
-      <GoalBody />
-      
     </Box>
   )
 }
-
-function GoalBody() {
-  return (
-  <Center>    
-    <Card margin={5} padding={5} boxShadow='lg'>
-        <CardHeader>
-          <Heading size='md'>How much would you like to save?</Heading>
-        </CardHeader>
-
-        <InputGroup>
-          <InputLeftElement
-            pointerEvents='none'
-            color='gray.300'
-            fontSize='1.2em'
-            children='$'
-          />
-          <Input placeholder='Enter amount' />
-        </InputGroup>
-
-        <CardFooter>
-          <Button colorScheme='teal'>Submit Goal</Button>
-        </CardFooter>
-      </Card>
-    </Center>
-  )
-}
-
-
 
 export default Goal
