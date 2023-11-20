@@ -188,10 +188,42 @@
       expenseItems.forEach(item => {
         const amount = parseFloat(item.innerText.split(' - $')[1].split(' ')[0]);
         totalExpenses += amount;
+        
       });
 
       const totalIncomeExpensesParagraph = document.getElementById('totalIncomeExpenses');
       totalIncomeExpensesParagraph.innerText = `Total Income: $${totalIncome.toFixed(2)} | Total Expenses: $${totalExpenses.toFixed(2)}`;
+
+      console.log(currentNetDiff(totalIncome, totalExpenses)); 
+    } 
+
+    function currentNetDiff(inc, exp) {
+      ret = inc - exp; 
+      return ret; 
+      console.log(ret);
+    }
+    
+    function savingAlg(target, expenses, cut, range) {
+      newTarget = target;
+      tempExp = expenses;
+      expenses.forEach(item => { 
+        parts = item.innerText.split(' - $');
+        originalAmount = parseFloat(parts[1].split(' ')[0]);
+        weight = parseFloat(parts[1].split(' ')[4]);
+        newAmount = originalAmount * ((weight) / 10) * cut;
+        item.innerText = `${parts[0]} - $${newAmount.toFixed(2)} (Importance: ${weight})`;
+        newTarget = newTarget - (originalAmount - newAmount) ;
+      }) 
+      if (target > range) {
+        savingAlg(newTarget, expenses, cut, range);
+        return;
+      } else if (target < - range) {
+        cut = cut / 2;
+        savingAlg(target, tempExp, cut, range);
+        return;
+      } else {
+        return;
+      }
     }
 
     function updateNetIncome() {
