@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Planner</title>
+  <!-- Include Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background-color: #27213C; /* Dark Blue */
+      color: #fff;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+
+    .column {
+      width: 45%;
+      padding: 20px;
+      background-color: #27213C;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    #incomeItemsContainer, #expenseItemsContainer {
+      margin-top: 20px;
+    }
+
+    #totalIncomeExpenses, #netIncome {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Style for the chart containers */
+    .chart-container {
+      width: 80%; /* Adjust the width as needed */
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Budget Planner</h1>
+
+  <div class="container">
+    <div class="column">
+      <h2>Income Sources</h2>
+      <label for="incomeName">Source:</label>
+      <input type="text" id="incomeName" placeholder="Enter income source">
+      <label for="incomeAmount">Amount:</label>
+      <input type="number" id="incomeAmount" placeholder="Enter income amount">
+      <button onclick="addIncome()">Add Income</button>
+
+      <!-- Separate container for income items -->
+      <div id="incomeItemsContainer" class="container"></div>
+    </div>
+
+    <div class="column">
+      <h2>Expenses</h2>
+      <label for="expenseType">Type:</label>
+      <select id="expenseType">
+        <option value="fixed">Fixed Expense</option>
+        <option value="variable">Variable Expense</option>
+      </select>
+      <label for="expenseName">Name:</label>
+      <input type="text" id="expenseName" placeholder="Enter expense name">
+      <label for="expenseAmount">Amount:</label>
+      <input type="number" id="expenseAmount" placeholder="Enter expense amount">
+      <label for="importance">Importance (1-10):</label>
+      <input type="number" id="importance" placeholder="Enter importance (1-10)" min="1" max="10">
+      <button onclick="addExpense()">Add Expense</button>
+
+      <!-- Separate container for expense items -->
+      <div id="expenseItemsContainer" class="container"></div>
+    </div>
+  </div>
+
+  <!-- Paragraph for Total Income/Total Expenses -->
+  <p id="totalIncomeExpenses">Total Income: $0.00 | Total Expenses: $0.00</p>
+
+  <!-- Paragraph for Net Income -->
+  <p id="netIncome">Net Income: $0.00</p>
+
+  <!-- Bar graphs for Income and Expenses -->
+  <div class="chart-container">
+    <canvas id="incomeChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="expenseChart"></canvas>
+  </div>
+
+  <script>
+    function addIncome() {
+      const incomeName = document.getElementById('incomeName').value;
+      const incomeAmount = document.getElementById('incomeAmount').value;
+
+      if (incomeName && incomeAmount) {
+        const incomeItemsContainer = document.getElementById('incomeItemsContainer');
+        const incomeItem = document.createElement('div');
+        incomeItem.innerHTML = `<p>${incomeName} - $${incomeAmount}</p>`;
+        incomeItemsContainer.appendChild(incomeItem);
+
+        // Clear input fields
+        document.getElementById('incomeName').value = '';
+        document.getElementById('incomeAmount').value = '';
+
+        updateTotalIncomeExpenses();
+        updateNetIncome();
+        updateIncomeChart();
+      }
+    }
+
+    function addExpense() {
+      const expenseType = document.getElementById('expenseType').value;
+      const expenseName = document.getElementById('expenseName').value;
+      const expenseAmount = document.getElementById('expenseAmount').value;
+      const importance = document.getElementById('importance').value;
+
+      if (expenseName && expenseAmount && importance) {
+        const expenseItemsContainer = document.getElementById('expenseItemsContainer');
+        const expenseItem = document.createElement('div');
+        expenseItem.innerHTML = `<p>${expenseType.toUpperCase()}: ${expenseName} - $${expenseAmount} (Importance: ${importance}/10)</p>`;
+        expenseItemsContainer.appendChild(expenseItem);
+
+        // Clear input fields
+        document.getElementById('expenseName').value = '';
+        document.getElementById('expenseAmount').value = '';
+        document.getElementById('importance').value = '';
+
+        updateTotalIncomeExpenses();
+        updateNetIncome();
+        updateExpenseChart();
+      }
+    }
+
+    function updateTotalIncomeExpenses() {
+      const incomeItems = document.querySelectorAll('#incomeItemsContainer p');
+      const expenseItems = document.querySelectorAll('#expenseItemsContainer p');
+
+      let totalIncome = 0;
+      let totalExpenses = 0;
+
+      incomeItems.forEach(item => {
+        const amount = parseFloat(item.innerText.split(' - $')[1]);
+        totalIncome += amount;
+      });
+
+      expenseItems.forEach(item => {
+        const amount = parseFloat(item.innerText.split(' - $')[1].split(' ')[0]);
+        totalExpenses += amount;
+        
+      });
+
+      const totalIncomeExpensesParagraph = document.getElementById('totalIncomeExpenses');
+      totalIncomeExpensesParagraph.innerText = `Total Income: $${totalIncome.toFixed(2)} | Total Expenses: $${totalExpenses.toFixed(2)}`;
+
+      console.log(currentNetDiff(totalIncome, totalExpenses)); 
+    } 
+
+    function currentNetDiff(inc, exp) {
+      ret = inc - exp; 
+      return ret; 
+      console.log(ret);
+    }
+    
+    function savingAlg(target, expenses, cut, range) {
+      newTarget = target;
+      tempExp = expenses;
+      expenses.forEach(item => { 
+        parts = item.innerText.split(' - $');
+        originalAmount = parseFloat(parts[1].split(' ')[0]);
+        weight = parseFloat(parts[1].split(' ')[4]);
+        newAmount = originalAmount * ((weight) / 10) * cut;
+        item.innerText = `${parts[0]} - $${newAmount.toFixed(2)} (Importance: ${weight})`;
+        newTarget = newTarget - (originalAmount - newAmount) ;
+      }) 
+      if (target > range) {
+        savingAlg(newTarget, expenses, cut, range);
+        return;
+      } else if (target < - range) {
+        cut = cut / 2;
+        savingAlg(target, tempExp, cut, range);
+        return;
+      } else {
+        return;
+      }
+    }
+
+    function updateNetIncome() {
+      const incomeItems = document.querySelectorAll('#incomeItemsContainer p');
+      const expenseItems = document.querySelectorAll('#expenseItemsContainer p');
+
+      let totalIncome = 0;
+      let totalExpenses = 0;
+
+      incomeItems.forEach(item => {
+        const amount = parseFloat(item.innerText.split(' - $')[1]);
+        totalIncome += amount;
+      });
+
+      expenseItems.forEach(item => {
+        const amount = parseFloat(item.innerText.split(' - $')[1].split(' ')[0]);
+        totalExpenses += amount;
+      });
+
+      const netIncomeParagraph = document.getElementById('netIncome');
+      const netIncome = totalIncome - totalExpenses;
+      netIncomeParagraph.innerText = `Net Income: $${netIncome.toFixed(2)}`;
+    }
+
+    function updateIncomeChart() {
+      const incomeItems = document.querySelectorAll('#incomeItemsContainer p');
+      const incomeLabels = [];
+      const incomeAmounts = [];
+
+      incomeItems.forEach(item => {
+        const parts = item.innerText.split(' - $');
+        incomeLabels.push(parts[0]);
+        incomeAmounts.push(parseFloat(parts[1]));
+      });
+
+      updateBarChart('incomeChart', 'Income Sources', incomeLabels, incomeAmounts, 'rgba(75, 192, 192, 0.7)');
+    }
+
+    function updateExpenseChart() {
+      const expenseItems = document.querySelectorAll('#expenseItemsContainer p');
+      const expenseLabels = [];
+      const expenseAmounts = [];
+
+      expenseItems.forEach(item => {
+        const parts = item.innerText.split(' - $');
+        expenseLabels.push(parts[0]);
+        expenseAmounts.push(parseFloat(parts[1].split(' ')[0]));
+      });
+
+      updateBarChart('expenseChart', 'Expenses', expenseLabels, expenseAmounts, 'rgba(255, 99, 132, 0.7)');
+    }
+
+    function updateBarChart(chartId, chartLabel, labels, data, color) {
+      const ctx = document.getElementById(chartId).getContext('2d');
+      // Clear existing chart
+      Chart.helpers.each(Chart.instances, function(instance){
+        instance.destroy();
+      });
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: chartLabel,
+            data: data,
+            backgroundColor: color,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
