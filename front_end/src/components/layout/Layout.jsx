@@ -49,7 +49,7 @@ export const Layout = ({children, curIndex}) => {
           </Step>
         ))}
       </Stepper>
-
+      
       {children}
     </Box>
   );

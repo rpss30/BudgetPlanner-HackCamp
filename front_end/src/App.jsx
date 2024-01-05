@@ -1,11 +1,11 @@
 import "./App.css";
 // React Dom Router
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Planner from "./pages/Planner";
-import Goal from "./pages/Goal";
-import Tips from "./pages/Tips";
-import Result from "./pages/Result";
+import Home from "./pages/home/Home";
+import Planner from "./pages/planner/Planner";
+import Goal from "./pages/goal/Goal";
+import Tips from "./pages/tips/Tips";
+import Result from "./pages/result/Result";
 
 export default function App() {
   return (

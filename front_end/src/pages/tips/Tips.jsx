@@ -10,7 +10,7 @@ import {
   Center
 } from '@chakra-ui/react'
 
-import { Layout } from '../components/layout/Layout';
+import { Layout } from '../../components/layout/Layout';
 
 const Tips = () => {
   return (
