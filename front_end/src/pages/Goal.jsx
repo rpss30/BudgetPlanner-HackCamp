@@ -12,11 +12,11 @@ import {
   InputLeftElement,
 } from "@chakra-ui/react";
 
-import { Layout } from "../components/layout/layout";
+import { Layout } from "../components/layout/Layout";
 
-function Goal() {
+const Goal = () => {
   return (
-    <Layout>
+    <Layout curIndex={1}>
       <GoalBody />
     </Layout>
   );

@@ -14,9 +14,9 @@ import {
   Select,
 } from '@chakra-ui/react';
 
-import { Layout } from '../components/layout/layout';
+import { Layout } from '../components/layout/Layout';
 
-function Planner() {
+const Planner = () => {
   
 
   const [incomeList, setIncomeList] = useState([]);
@@ -45,7 +45,7 @@ function Planner() {
   };
 
   return (
-    <Layout>
+    <Layout curIndex={0}>
       <SimpleGrid
         spacing={4}
         margin={5}

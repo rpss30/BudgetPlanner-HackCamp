@@ -19,9 +19,9 @@ const steps = [
   { title: "Fourth", description: "Graph Result" },
 ];
 
-export const Layout = ({children}) => {
+export const Layout = ({children, curIndex}) => {
   const { activeStep } = useSteps({
-    index: 0,
+    index: curIndex,
     count: steps.length,
   });
 

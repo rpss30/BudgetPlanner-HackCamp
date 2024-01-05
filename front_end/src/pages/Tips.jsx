@@ -10,11 +10,11 @@ import {
   Center
 } from '@chakra-ui/react'
 
-import { Layout } from '../components/layout/layout';
+import { Layout } from '../components/layout/Layout';
 
-function Tips() {
+const Tips = () => {
   return (
-    <Layout>
+    <Layout curIndex={2}>
       <TipsBody />
     </Layout>
   )
@@ -39,4 +39,4 @@ function TipsBody() {
   )
 }
 
-export default Tips
+export default Tips;
